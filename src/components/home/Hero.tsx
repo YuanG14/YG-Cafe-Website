@@ -1,6 +1,7 @@
 import { motion } from 'framer-motion';
+import { Link } from 'react-router-dom';
 import { Badge } from '../ui/Badge';
-import { Button } from '../ui/Button';
+import { buttonStyles } from '../ui/Button';
 import { FadeIn } from '../ui/FadeIn';
 import { placeholderPhoto } from '../../lib/placeholderPhoto';
 
@@ -22,12 +23,15 @@ export function Hero() {
           the long conversations, the ones we'd go back to in a heartbeat.
         </p>
         <div className="mt-9 flex flex-wrap items-center gap-3">
-          <Button size="lg" disabled title="Arrives in Phase 3">
+          <Link to="/collection/new" className={buttonStyles('primary', 'lg')}>
             Add our first cafe
-          </Button>
-          <Button size="lg" variant="secondary" disabled title="Arrives in Phase 5">
+          </Link>
+          <span
+            className={buttonStyles('secondary', 'lg', 'opacity-50 pointer-events-none')}
+            title="Arrives in Phase 5"
+          >
             Pick a date for us
-          </Button>
+          </span>
         </div>
       </FadeIn>
 

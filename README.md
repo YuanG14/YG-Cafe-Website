@@ -33,6 +33,22 @@ cp .env.example .env
 npm run dev
 ```
 
+## Phase 4 — Cafe Collection (this phase)
+
+- **Database:** `cafes` + `cafe_photos` tables, `cafe-photos` storage bucket (`supabase/migrations/001_cafes_schema.sql`). RLS is intentionally simple for now — any authenticated user can read/write; `created_by` is tracked on every row so the upcoming RBAC phase can tighten this to ownership + admin-override policies without a schema change.
+- **Service layer:** `src/services/cafeService.ts` is the only file that talks to Supabase for cafes — everything else uses domain types (`Cafe`, `CafeInput`, `CafePhoto`) and never sees snake_case columns.
+- **Hooks:** `useCafes()` (list, with optimistic favorite toggle) and `useCafe(id)` (single record) — both handle loading/error state so pages don't repeat that logic.
+- **Full CRUD:** `/collection` (grid), `/collection/new` (create), `/collection/:id` (detail — photos, ratings, journal, drinks/food, spend, edit/delete), `/collection/:id/edit`.
+- **Photo uploads:** `PhotoUploader` on the detail page uploads directly to Supabase Storage and writes a `cafe_photos` row; deleting removes both. Photos require a saved cafe, so they're managed from the detail page rather than the create form.
+- **Ratings:** six categories (overall, coffee, food, ambiance, service, value), editable via `RatingInput`, displayed via the existing `StarRating`.
+- **Tags, drinks, food:** all use the same reusable `TagInput` chip component.
+- **Favorite:** toggle on the card, the grid, and the detail page, with optimistic UI.
+- The landing page's "Featured Memories" section now pulls real favorite cafes instead of placeholder data, falling back to an empty-state prompt when the collection is empty.
+
+### Running the Phase 4 migration
+
+In your Supabase project's SQL Editor, run `supabase/migrations/001_cafes_schema.sql`. It creates the tables, indexes, RLS policies, and the `cafe-photos` storage bucket in one go.
+
 ## Getting started
 
 ```bash
@@ -46,16 +62,22 @@ npm run dev
 src/
   components/
     layout/    # Navbar, AppLayout, PageContainer, ComingSoon, Footer
-    ui/        # Button, Card, Badge, StarRating, SectionHeading, TextField, FadeIn
+    ui/        # Button, Card, Badge, StarRating, SectionHeading, TextField, TagInput, FadeIn
     home/      # Landing page sections (Hero, FeaturedMemories, StatsPreview, RandomDateCTA)
-    cafe/      # Domain components reused across phases (MemoryCard)
+    cafe/      # CafeForm, CafeDetail pieces, MemoryCard, RatingInput, PhotoUploader
     auth/      # ProtectedRoute, PublicOnlyRoute, AuthLayout
   context/
     AuthContext.tsx  # Session state + signIn/signUp/signOut
+  services/
+    cafeService.ts   # Only file that talks to the cafes/cafe_photos tables
+  hooks/
+    useCafes.ts, useCafe.ts
   lib/
-    supabase/client.ts  # Supabase client + remember-me storage adapter
+    supabase/client.ts, supabase/storage.ts
     cn.ts, placeholderPhoto.ts
   pages/       # One file per route
-  types/       # Domain types shared across future phases
+  types/       # Domain types (Cafe, CafeInput, CafePhoto, Wishlist, ...)
   index.css    # Design tokens + Tailwind v4 theme
+supabase/
+  migrations/  # SQL to run in the Supabase SQL Editor
 ```

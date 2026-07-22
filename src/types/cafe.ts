@@ -1,29 +1,77 @@
 /**
- * Domain types for the app. These are shaped ahead of time so later phases
- * (Cafe Collection, Wishlist, Stats) can build against a stable contract.
- * No data-fetching or persistence logic lives here yet — that arrives with
- * the Supabase phase.
+ * Domain types used throughout the app (camelCase). The database uses
+ * snake_case columns — src/services/cafeService.ts maps between the two so
+ * no component ever has to know the DB shape.
  */
 
 export type RatingCategory = 'overall' | 'coffee' | 'food' | 'ambiance' | 'service' | 'value';
 
 export type Ratings = Record<RatingCategory, number>;
 
+export interface CafePhoto {
+  id: string;
+  cafeId: string;
+  /** Public URL, already resolved — components never build storage paths themselves. */
+  url: string;
+  storagePath: string;
+}
+
 export interface Cafe {
   id: string;
+  createdBy: string;
+  name: string;
+  address: string | null;
+  googleMapsUrl: string | null;
+  dateVisited: string; // ISO date (yyyy-mm-dd)
+  isFavorite: boolean;
+  tags: string[];
+  journalEntry: string | null;
+  drinksOrdered: string[];
+  foodOrdered: string[];
+  totalSpent: number | null;
+  ratings: Ratings;
+  photos: CafePhoto[];
+  createdAt: string;
+  updatedAt: string;
+}
+
+/** Fields the user actually fills in — everything else is server-assigned. */
+export interface CafeInput {
   name: string;
   address: string;
-  googleMapsUrl?: string;
-  photos: string[];
-  ratings: Ratings;
+  googleMapsUrl: string;
   dateVisited: string;
   isFavorite: boolean;
   tags: string[];
-  journalEntry?: string;
+  journalEntry: string;
   drinksOrdered: string[];
   foodOrdered: string[];
-  totalSpent: number;
+  totalSpent: number | null;
+  ratings: Ratings;
 }
+
+export const EMPTY_RATINGS: Ratings = {
+  overall: 0,
+  coffee: 0,
+  food: 0,
+  ambiance: 0,
+  service: 0,
+  value: 0,
+};
+
+export const EMPTY_CAFE_INPUT: CafeInput = {
+  name: '',
+  address: '',
+  googleMapsUrl: '',
+  dateVisited: new Date().toISOString().slice(0, 10),
+  isFavorite: false,
+  tags: [],
+  journalEntry: '',
+  drinksOrdered: [],
+  foodOrdered: [],
+  totalSpent: null,
+  ratings: EMPTY_RATINGS,
+};
 
 export type WishlistPriority = 'must-visit' | 'interested' | 'someday';
 

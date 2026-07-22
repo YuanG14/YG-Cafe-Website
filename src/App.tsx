@@ -4,6 +4,9 @@ import { ProtectedRoute } from './components/auth/ProtectedRoute';
 import { PublicOnlyRoute } from './components/auth/PublicOnlyRoute';
 import { Home } from './pages/Home';
 import { Collection } from './pages/Collection';
+import { CafeNew } from './pages/CafeNew';
+import { CafeDetail } from './pages/CafeDetail';
+import { CafeEdit } from './pages/CafeEdit';
 import { Wishlist } from './pages/Wishlist';
 import { RandomDate } from './pages/RandomDate';
 import { Stats } from './pages/Stats';
@@ -25,6 +28,9 @@ function App() {
         <Route element={<AppLayout />}>
           <Route path="/" element={<Home />} />
           <Route path="/collection" element={<Collection />} />
+          <Route path="/collection/new" element={<CafeNew />} />
+          <Route path="/collection/:id" element={<CafeDetail />} />
+          <Route path="/collection/:id/edit" element={<CafeEdit />} />
           <Route path="/wishlist" element={<Wishlist />} />
           <Route path="/random" element={<RandomDate />} />
           <Route path="/stats" element={<Stats />} />
