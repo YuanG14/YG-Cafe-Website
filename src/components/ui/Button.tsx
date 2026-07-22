@@ -2,8 +2,8 @@ import { forwardRef } from 'react';
 import type { ButtonHTMLAttributes, ReactNode } from 'react';
 import { cn } from '../../lib/cn';
 
-type ButtonVariant = 'primary' | 'secondary' | 'ghost';
-type ButtonSize = 'md' | 'lg';
+export type ButtonVariant = 'primary' | 'secondary' | 'ghost';
+export type ButtonSize = 'md' | 'lg';
 
 interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
   variant?: ButtonVariant;
@@ -24,21 +24,30 @@ const sizeStyles: Record<ButtonSize, string> = {
   lg: 'h-14 px-7 text-base gap-2.5',
 };
 
+/**
+ * Shared style builder so non-<button> elements (e.g. a router Link that
+ * should *look* like a button) can reuse the exact same visual treatment
+ * instead of duplicating class strings.
+ */
+export function buttonStyles(
+  variant: ButtonVariant = 'primary',
+  size: ButtonSize = 'md',
+  className?: string
+): string {
+  return cn(
+    'inline-flex items-center justify-center rounded-pill font-medium',
+    'transition-all duration-200 ease-out active:scale-[0.97]',
+    'disabled:opacity-50 disabled:pointer-events-none',
+    variantStyles[variant],
+    sizeStyles[size],
+    className
+  );
+}
+
 export const Button = forwardRef<HTMLButtonElement, ButtonProps>(
   ({ className, variant = 'primary', size = 'md', icon, children, ...props }, ref) => {
     return (
-      <button
-        ref={ref}
-        className={cn(
-          'inline-flex items-center justify-center rounded-pill font-medium',
-          'transition-all duration-200 ease-out active:scale-[0.97]',
-          'disabled:opacity-50 disabled:pointer-events-none',
-          variantStyles[variant],
-          sizeStyles[size],
-          className
-        )}
-        {...props}
-      >
+      <button ref={ref} className={buttonStyles(variant, size, className)} {...props}>
         {icon}
         {children}
       </button>
