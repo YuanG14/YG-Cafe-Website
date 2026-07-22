@@ -11,7 +11,7 @@ const NAV_ITEMS = [
 ];
 
 export function Navbar() {
-  const { user, signOut } = useAuth();
+  const { user, isAdmin, signOut } = useAuth();
 
   return (
     <header className="sticky top-4 z-50 px-4">
@@ -50,15 +50,22 @@ export function Navbar() {
         </ul>
 
         {user && (
-          <button
-            type="button"
-            onClick={() => signOut()}
-            title={`Log out of ${user.email}`}
-            className="shrink-0 inline-flex items-center gap-1.5 rounded-pill px-3 py-2 text-xs sm:text-sm font-medium text-ink-soft hover:text-ink hover:bg-blush transition-colors duration-200"
-          >
-            <span aria-hidden="true">↩</span>
-            <span className="hidden sm:inline">Log out</span>
-          </button>
+          <div className="flex items-center gap-2 shrink-0">
+            {isAdmin && (
+              <span className="hidden sm:inline-flex items-center rounded-pill bg-gold-soft px-2.5 py-1 text-xs font-medium text-gold">
+                Admin
+              </span>
+            )}
+            <button
+              type="button"
+              onClick={() => signOut()}
+              title={`Log out of ${user.email}`}
+              className="inline-flex items-center gap-1.5 rounded-pill px-3 py-2 text-xs sm:text-sm font-medium text-ink-soft hover:text-ink hover:bg-blush transition-colors duration-200"
+            >
+              <span aria-hidden="true">↩</span>
+              <span className="hidden sm:inline">Log out</span>
+            </button>
+          </div>
         )}
       </nav>
     </header>

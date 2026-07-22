@@ -49,6 +49,31 @@ npm run dev
 
 In your Supabase project's SQL Editor, run `supabase/migrations/001_cafes_schema.sql`. It creates the tables, indexes, RLS policies, and the `cafe-photos` storage bucket in one go.
 
+## Roles foundation — creating your admin account
+
+This adds the storage for roles (`profiles` table) so an account can actually
+*be* admin — it does not yet add admin-only pages or route guards; that's
+still queued as its own step. `useAuth()` now exposes `profile` and `isAdmin`.
+
+1. Run `supabase/migrations/002_profiles_and_roles.sql` in your Supabase
+   project's SQL Editor. This creates the `profiles` table, an `app_role`
+   enum (`admin | member | guest`), and a trigger that auto-creates a
+   `member` profile row for every new signup.
+2. If you haven't registered your own account yet, go to `/register` and do
+   that first — you need a row in `profiles` before you can promote it.
+3. Back in the Supabase SQL Editor, promote yourself:
+   ```sql
+   update public.profiles set role = 'admin' where email = 'you@example.com';
+   ```
+   This is deliberately **only** possible via direct SQL — there is no
+   button or API route in the app that can set someone's own role, so
+   there's no client-side path to self-promote to admin.
+4. Log out and back in (or just refresh) — you should see a small **Admin**
+   badge next to the logout button in the navbar once your profile loads.
+
+Your girlfriend's account, and any other signups, default to `member` and
+stay that way unless you run the same SQL for them.
+
 ## Getting started
 
 ```bash
