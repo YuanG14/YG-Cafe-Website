@@ -1,5 +1,6 @@
 import { NavLink } from 'react-router-dom';
 import { cn } from '../../lib/cn';
+import { useAuth } from '../../context/AuthContext';
 
 const NAV_ITEMS = [
   { to: '/', label: 'Home' },
@@ -10,9 +11,11 @@ const NAV_ITEMS = [
 ];
 
 export function Navbar() {
+  const { user, signOut } = useAuth();
+
   return (
     <header className="sticky top-4 z-50 px-4">
-      <nav className="mx-auto flex max-w-3xl items-center justify-between gap-4 rounded-pill glass-panel border border-white/60 px-4 py-2 shadow-soft">
+      <nav className="mx-auto flex max-w-4xl items-center justify-between gap-3 rounded-pill glass-panel border border-white/60 px-4 py-2 shadow-soft">
         <NavLink to="/" className="flex items-center gap-2 pl-2 pr-1 shrink-0">
           <span
             className="grid h-8 w-8 place-items-center rounded-full bg-primary text-sm"
@@ -45,6 +48,18 @@ export function Navbar() {
             </li>
           ))}
         </ul>
+
+        {user && (
+          <button
+            type="button"
+            onClick={() => signOut()}
+            title={`Log out of ${user.email}`}
+            className="shrink-0 inline-flex items-center gap-1.5 rounded-pill px-3 py-2 text-xs sm:text-sm font-medium text-ink-soft hover:text-ink hover:bg-blush transition-colors duration-200"
+          >
+            <span aria-hidden="true">↩</span>
+            <span className="hidden sm:inline">Log out</span>
+          </button>
+        )}
       </nav>
     </header>
   );
