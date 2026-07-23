@@ -3,7 +3,8 @@ import { Link } from 'react-router-dom';
 import { Badge } from '../ui/Badge';
 import { buttonStyles } from '../ui/Button';
 import { FadeIn } from '../ui/FadeIn';
-import { placeholderPhoto } from '../../lib/placeholderPhoto';
+import heroMainPhoto from '../../assets/hero/hero-main.webp';
+import heroSidePhoto from '../../assets/hero/hero-side-1.webp';
 
 const STAMPS = ['☕', '🥐', '📖', '❤️', '📍'];
 
@@ -37,14 +38,14 @@ export function Hero() {
         <div className="grid grid-cols-5 grid-rows-5 gap-4 h-[420px] sm:h-[480px]">
           <div className="col-span-3 row-span-5 rounded-card overflow-hidden shadow-lift">
             <img
-              src={placeholderPhoto('hero-main', 700, 900)}
+              src={heroMainPhoto}
               alt=""
               className="h-full w-full object-cover"
             />
           </div>
           <div className="col-span-2 row-span-3 rounded-card overflow-hidden shadow-soft translate-y-4">
             <img
-              src={placeholderPhoto('hero-side-1', 500, 600)}
+              src={heroSidePhoto}
               alt=""
               className="h-full w-full object-cover"
             />
