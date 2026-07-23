@@ -1,12 +1,13 @@
 import { motion } from 'framer-motion';
 import type { Variants } from 'framer-motion';
 import { SectionHeading } from '../ui/SectionHeading';
+import { formatCurrency } from '../../lib/currency';
 
 const STATS = [
   { value: '12', label: 'Cafes explored' },
   { value: '4.7', label: 'Average rating' },
   { value: '3', label: 'Favorites saved' },
-  { value: '$286', label: 'Spent chasing good coffee' },
+  { value: formatCurrency(286), label: 'Spent chasing good coffee' },
 ];
 
 const container: Variants = {

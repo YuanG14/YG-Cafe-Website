@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useState } from 'react';
 import { listCafes, toggleFavorite as toggleFavoriteRequest } from '../services/cafeService';
+import { getErrorMessage } from '../lib/errors';
 import type { Cafe } from '../types/cafe';
 
 interface UseCafesResult {
@@ -22,7 +23,7 @@ export function useCafes(): UseCafesResult {
       const result = await listCafes();
       setCafes(result);
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Something went wrong loading your cafes.');
+      setError(getErrorMessage(err, 'Something went wrong loading your cafes.'));
     } finally {
       setLoading(false);
     }

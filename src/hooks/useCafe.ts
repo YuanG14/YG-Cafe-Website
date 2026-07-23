@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useState } from 'react';
 import { getCafe } from '../services/cafeService';
+import { getErrorMessage } from '../lib/errors';
 import type { Cafe } from '../types/cafe';
 
 interface UseCafeResult {
@@ -22,7 +23,7 @@ export function useCafe(id: string | undefined): UseCafeResult {
       const result = await getCafe(id);
       setCafe(result);
     } catch (err) {
-      setError(err instanceof Error ? err.message : "Couldn't find that cafe.");
+      setError(getErrorMessage(err, "Couldn't find that cafe."));
     } finally {
       setLoading(false);
     }

@@ -8,6 +8,7 @@ import { CafeGallery } from '../components/cafe/CafeGallery';
 import { RatingsPanel } from '../components/cafe/RatingsPanel';
 import { CafeTimeline } from '../components/cafe/CafeTimeline';
 import { useCafe } from '../hooks/useCafe';
+import { formatCurrency } from '../lib/currency';
 import { deleteCafe, toggleFavorite as toggleFavoriteRequest } from '../services/cafeService';
 
 export function CafeDetail() {
@@ -170,7 +171,7 @@ export function CafeDetail() {
                         Total spent
                       </h3>
                       <p className="text-sm text-ink leading-relaxed">
-                        ${cafe.totalSpent.toFixed(2)}
+                        {formatCurrency(cafe.totalSpent)}
                       </p>
                     </div>
                   )}

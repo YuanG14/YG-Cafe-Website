@@ -1,5 +1,6 @@
 import { useRef, useState } from 'react';
 import { addCafePhoto, deleteCafePhoto } from '../../services/cafeService';
+import { getErrorMessage } from '../../lib/errors';
 import type { CafePhoto } from '../../types/cafe';
 
 interface PhotoUploaderProps {
@@ -27,7 +28,7 @@ export function PhotoUploader({ cafeId, photos, onPhotosChange }: PhotoUploaderP
       const uploaded = await Promise.all(Array.from(files).map((file) => addCafePhoto(cafeId, file)));
       onPhotosChange([...photos, ...uploaded]);
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Some photos failed to upload.');
+      setError(getErrorMessage(err, 'Some photos failed to upload.'));
     } finally {
       setUploading(false);
       if (fileInputRef.current) fileInputRef.current.value = '';

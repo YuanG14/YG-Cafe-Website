@@ -4,6 +4,7 @@ import {
   deleteWishlistItem,
   convertWishlistItemToCafe,
 } from '../services/wishlistService';
+import { getErrorMessage } from '../lib/errors';
 import type { WishlistCafe } from '../types/wishlist';
 
 interface UseWishlistResult {
@@ -28,7 +29,7 @@ export function useWishlist(): UseWishlistResult {
       const result = await listWishlist();
       setItems(result);
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Something went wrong loading the wishlist.');
+      setError(getErrorMessage(err, 'Something went wrong loading the wishlist.'));
     } finally {
       setLoading(false);
     }

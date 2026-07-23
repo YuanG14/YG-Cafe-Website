@@ -3,6 +3,7 @@ import type { FormEvent } from 'react';
 import { TextField } from '../ui/TextField';
 import { PillSelect } from '../ui/PillSelect';
 import { Button } from '../ui/Button';
+import { getErrorMessage } from '../../lib/errors';
 import type { WishlistInput, WishlistPriority, WishlistStatus } from '../../types/wishlist';
 
 const PRIORITY_OPTIONS: { value: WishlistPriority; label: string }[] = [
@@ -44,7 +45,7 @@ export function WishlistForm({ initialValue, submitLabel, onSubmit, onCancel }: 
     try {
       await onSubmit(values);
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Something went wrong saving this.');
+      setError(getErrorMessage(err, 'Something went wrong saving this.'));
       setSubmitting(false);
     }
   }
@@ -82,7 +83,7 @@ export function WishlistForm({ initialValue, submitLabel, onSubmit, onCancel }: 
       />
 
       <TextField
-        label="Estimated budget"
+        label="Estimated budget (₱)"
         type="number"
         step="0.01"
         min="0"

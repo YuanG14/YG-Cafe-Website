@@ -6,6 +6,8 @@ import { Button } from '../ui/Button';
 import { WishlistForm } from './WishlistForm';
 import { useAuth } from '../../context/AuthContext';
 import { updateWishlistItem, setWishlistStatus } from '../../services/wishlistService';
+import { getErrorMessage } from '../../lib/errors';
+import { formatCurrency } from '../../lib/currency';
 import type { WishlistCafe, WishlistInput, WishlistPriority } from '../../types/wishlist';
 
 const PRIORITY_TONE: Record<WishlistPriority, 'pink' | 'sky' | 'neutral'> = {
@@ -24,7 +26,7 @@ interface WishlistCardProps {
   item: WishlistCafe;
   onChanged: () => void;
   onDelete: (id: string) => void;
-  onConvert: (item: WishlistCafe) => void;
+  onConvert: (item: WishlistCafe) => Promise<void>;
 }
 
 function toInput(item: WishlistCafe): WishlistInput {
@@ -44,6 +46,7 @@ export function WishlistCard({ item, onChanged, onDelete, onConvert }: WishlistC
   const [editing, setEditing] = useState(false);
   const [confirmingDelete, setConfirmingDelete] = useState(false);
   const [converting, setConverting] = useState(false);
+  const [convertError, setConvertError] = useState<string | null>(null);
 
   async function handleUpdate(input: WishlistInput) {
     await updateWishlistItem(item.id, input);
@@ -59,8 +62,11 @@ export function WishlistCard({ item, onChanged, onDelete, onConvert }: WishlistC
   async function handleConvert() {
     if (!user) return;
     setConverting(true);
+    setConvertError(null);
     try {
-      onConvert(item);
+      await onConvert(item);
+    } catch (err) {
+      setConvertError(getErrorMessage(err, "Couldn't add this to the collection."));
     } finally {
       setConverting(false);
     }
@@ -108,7 +114,7 @@ export function WishlistCard({ item, onChanged, onDelete, onConvert }: WishlistC
         <Badge tone={item.status === 'planned' ? 'gold' : 'neutral'}>
           {item.status === 'planned' ? 'Planned' : 'Idea'}
         </Badge>
-        {item.estimatedBudget != null && <span>~${item.estimatedBudget.toFixed(2)}</span>}
+        {item.estimatedBudget != null && <span>~{formatCurrency(item.estimatedBudget)}</span>}
         {item.googleMapsUrl && (
           <a
             href={item.googleMapsUrl}
@@ -122,6 +128,12 @@ export function WishlistCard({ item, onChanged, onDelete, onConvert }: WishlistC
       </div>
 
       {item.notes && <p className="text-sm text-ink-soft leading-relaxed">{item.notes}</p>}
+
+      {convertError && (
+        <p role="alert" className="text-sm text-red-500">
+          {convertError}
+        </p>
+      )}
 
       <div className="flex items-center gap-4 pt-2 border-t border-hairline mt-1">
         {item.status === 'idea' && (

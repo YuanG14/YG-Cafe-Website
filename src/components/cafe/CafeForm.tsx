@@ -4,6 +4,7 @@ import { TextField } from '../ui/TextField';
 import { TagInput } from '../ui/TagInput';
 import { Button } from '../ui/Button';
 import { RatingInput } from './RatingInput';
+import { getErrorMessage } from '../../lib/errors';
 import type { CafeInput, RatingCategory } from '../../types/cafe';
 
 const RATING_LABELS: Record<RatingCategory, string> = {
@@ -43,7 +44,7 @@ export function CafeForm({ initialValue, submitLabel, onSubmit, onCancel }: Cafe
     try {
       await onSubmit(values);
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Something went wrong saving this cafe.');
+      setError(getErrorMessage(err, 'Something went wrong saving this cafe.'));
       setSubmitting(false);
     }
   }
@@ -80,7 +81,7 @@ export function CafeForm({ initialValue, submitLabel, onSubmit, onCancel }: Cafe
             onChange={(e) => update('dateVisited', e.target.value)}
           />
           <TextField
-            label="Total spent"
+            label="Total spent (₱)"
             type="number"
             step="0.01"
             min="0"
