@@ -1,6 +1,8 @@
 import { useRef, useState } from 'react';
 import { addCafePhoto, deleteCafePhoto } from '../../services/cafeService';
 import { getErrorMessage } from '../../lib/errors';
+import { useToast } from '../../context/ToastContext';
+import { ImageWithFallback } from '../ui/ImageWithFallback';
 import type { CafePhoto } from '../../types/cafe';
 
 interface PhotoUploaderProps {
@@ -17,6 +19,7 @@ interface PhotoUploaderProps {
 export function PhotoUploader({ cafeId, photos, onPhotosChange }: PhotoUploaderProps) {
   const [uploading, setUploading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const { success, error: toastError } = useToast();
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   async function handleFilesSelected(files: FileList | null) {
@@ -27,8 +30,11 @@ export function PhotoUploader({ cafeId, photos, onPhotosChange }: PhotoUploaderP
     try {
       const uploaded = await Promise.all(Array.from(files).map((file) => addCafePhoto(cafeId, file)));
       onPhotosChange([...photos, ...uploaded]);
+      success(uploaded.length > 1 ? `${uploaded.length} photos uploaded.` : 'Photo uploaded.');
     } catch (err) {
-      setError(getErrorMessage(err, 'Some photos failed to upload.'));
+      const message = getErrorMessage(err, 'Some photos failed to upload.');
+      setError(message);
+      toastError(message);
     } finally {
       setUploading(false);
       if (fileInputRef.current) fileInputRef.current.value = '';
@@ -42,7 +48,9 @@ export function PhotoUploader({ cafeId, photos, onPhotosChange }: PhotoUploaderP
     } catch {
       // Put it back if the delete failed server-side.
       onPhotosChange(photos);
-      setError("Couldn't delete that photo — try again.");
+      const message = "Couldn't delete that photo — try again.";
+      setError(message);
+      toastError(message);
     }
   }
 
@@ -53,7 +61,7 @@ export function PhotoUploader({ cafeId, photos, onPhotosChange }: PhotoUploaderP
       <div className="grid grid-cols-3 sm:grid-cols-4 gap-3">
         {photos.map((photo) => (
           <div key={photo.id} className="relative group aspect-square rounded-xl overflow-hidden border border-hairline">
-            <img src={photo.url} alt="" className="h-full w-full object-cover" />
+            <ImageWithFallback src={photo.url} alt="" className="h-full w-full object-cover" fallbackClassName="h-full w-full" />
             <button
               type="button"
               onClick={() => handleDelete(photo)}

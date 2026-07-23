@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { motion } from 'framer-motion';
 import { Lightbox } from '../ui/Lightbox';
+import { ImageWithFallback } from '../ui/ImageWithFallback';
 import { PhotoUploader } from './PhotoUploader';
 import { placeholderPhoto } from '../../lib/placeholderPhoto';
 import type { CafePhoto } from '../../types/cafe';
@@ -39,10 +40,11 @@ export function CafeGallery({ cafeId, cafeName, photos, onPhotosChange }: CafeGa
         className="rounded-card overflow-hidden shadow-lift cursor-pointer group aspect-[16/10] sm:aspect-[16/9]"
         onClick={() => setLightboxIndex(0)}
       >
-        <img
+        <ImageWithFallback
           src={displayPhotos[0].url}
           alt={cafeName}
           className="h-full w-full object-cover transition-transform duration-700 ease-out group-hover:scale-[1.03]"
+          fallbackClassName="h-full w-full"
         />
       </motion.div>
 
@@ -56,7 +58,12 @@ export function CafeGallery({ cafeId, cafeName, photos, onPhotosChange }: CafeGa
               className="shrink-0 h-20 w-24 rounded-lg overflow-hidden border border-hairline hover:border-accent/50 transition-colors"
               aria-label={`View photo ${i + 1} of ${cafeName}`}
             >
-              <img src={photo.url} alt="" className="h-full w-full object-cover" />
+              <ImageWithFallback
+                src={photo.url}
+                alt=""
+                className="h-full w-full object-cover"
+                fallbackClassName="h-full w-full"
+              />
             </button>
           ))}
         </div>

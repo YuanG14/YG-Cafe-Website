@@ -6,28 +6,49 @@ import { Button } from '../components/ui/Button';
 import { Card } from '../components/ui/Card';
 import { WishlistForm } from '../components/wishlist/WishlistForm';
 import { WishlistCard } from '../components/wishlist/WishlistCard';
+import { WishlistCardSkeleton } from '../components/wishlist/WishlistCardSkeleton';
 import { useWishlist } from '../hooks/useWishlist';
 import { useAuth } from '../context/AuthContext';
+import { useToast } from '../context/ToastContext';
 import { createWishlistItem } from '../services/wishlistService';
+import { usePageMeta } from '../lib/seo';
 import { EMPTY_WISHLIST_INPUT } from '../types/wishlist';
 import type { WishlistCafe, WishlistInput } from '../types/wishlist';
 
 export function Wishlist() {
+  usePageMeta({
+    title: 'Wishlist',
+    description: 'Cafes we have spotted but have not tried yet.',
+  });
   const { user } = useAuth();
   const navigate = useNavigate();
   const { items, loading, error, refetch, removeItem, convertToCollection } = useWishlist();
+  const { success, error: toastError } = useToast();
   const [adding, setAdding] = useState(false);
 
   async function handleCreate(input: WishlistInput) {
     if (!user) return;
     await createWishlistItem(input, user.id);
     setAdding(false);
+    success('Added to your wishlist.');
     refetch();
+  }
+
+  async function handleDelete(id: string) {
+    const removed = await removeItem(id);
+    if (removed) {
+      success('Removed from your wishlist.');
+    } else {
+      toastError("Couldn't remove that — try again.");
+    }
   }
 
   async function handleConvert(item: WishlistCafe) {
     if (!user) return;
+    // Errors are surfaced inline on the specific WishlistCard (it already
+    // shows a contextual message there) — this only reports success.
     const cafeId = await convertToCollection(item, user.id);
+    success(`${item.name} is now in your collection.`);
     navigate(`/collection/${cafeId}`);
   }
 
@@ -56,7 +77,13 @@ export function Wishlist() {
         </Card>
       )}
 
-      {loading && <p className="text-sm text-ink-soft">Loading your wishlist…</p>}
+      {loading && (
+        <div className="grid gap-5 sm:grid-cols-2" aria-busy="true" aria-label="Loading your wishlist">
+          {Array.from({ length: 4 }, (_, i) => (
+            <WishlistCardSkeleton key={i} />
+          ))}
+        </div>
+      )}
 
       {error && (
         <p role="alert" className="text-sm text-red-500">
@@ -80,7 +107,7 @@ export function Wishlist() {
               key={item.id}
               item={item}
               onChanged={refetch}
-              onDelete={removeItem}
+              onDelete={handleDelete}
               onConvert={handleConvert}
             />
           ))}
@@ -98,7 +125,7 @@ export function Wishlist() {
                 key={item.id}
                 item={item}
                 onChanged={refetch}
-                onDelete={removeItem}
+                onDelete={handleDelete}
                 onConvert={handleConvert}
               />
             ))}

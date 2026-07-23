@@ -3,15 +3,16 @@ import { PageContainer } from '../components/layout/PageContainer';
 import { SectionHeading } from '../components/ui/SectionHeading';
 import { usePageMeta } from '../lib/seo';
 
-export function NotFound() {
-  usePageMeta({ title: 'Page not found' });
+/** For signed-in users who reach something they don't have the role for. */
+export function Forbidden() {
+  usePageMeta({ title: 'Access restricted' });
   return (
     <PageContainer>
       <div className="flex flex-col items-center text-center py-16 sm:py-24">
         <SectionHeading
-          eyebrow="404"
-          title="This page wandered off."
-          description="Wherever it went, it isn't here. Let's head back."
+          eyebrow="403"
+          title="This one isn't yours to open."
+          description="You're signed in, but this page is restricted."
           align="center"
         />
         <Link

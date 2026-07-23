@@ -1,10 +1,11 @@
-import { useState } from 'react';
+import { memo, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Card } from '../ui/Card';
 import { Badge } from '../ui/Badge';
 import { Button } from '../ui/Button';
 import { WishlistForm } from './WishlistForm';
 import { useAuth } from '../../context/AuthContext';
+import { useToast } from '../../context/ToastContext';
 import { updateWishlistItem, setWishlistStatus } from '../../services/wishlistService';
 import { getErrorMessage } from '../../lib/errors';
 import { formatCurrency } from '../../lib/currency';
@@ -40,8 +41,14 @@ function toInput(item: WishlistCafe): WishlistInput {
   };
 }
 
-export function WishlistCard({ item, onChanged, onDelete, onConvert }: WishlistCardProps) {
+export const WishlistCard = memo(function WishlistCard({
+  item,
+  onChanged,
+  onDelete,
+  onConvert,
+}: WishlistCardProps) {
   const { user } = useAuth();
+  const { success, error: toastError } = useToast();
   const navigate = useNavigate();
   const [editing, setEditing] = useState(false);
   const [confirmingDelete, setConfirmingDelete] = useState(false);
@@ -51,12 +58,17 @@ export function WishlistCard({ item, onChanged, onDelete, onConvert }: WishlistC
   async function handleUpdate(input: WishlistInput) {
     await updateWishlistItem(item.id, input);
     setEditing(false);
+    success('Wishlist item updated.');
     onChanged();
   }
 
   async function handleMarkPlanned() {
-    await setWishlistStatus(item.id, 'planned');
-    onChanged();
+    try {
+      await setWishlistStatus(item.id, 'planned');
+      onChanged();
+    } catch (err) {
+      toastError(getErrorMessage(err, "Couldn't update that — try again."));
+    }
   }
 
   async function handleConvert() {
@@ -185,4 +197,4 @@ export function WishlistCard({ item, onChanged, onDelete, onConvert }: WishlistC
       </div>
     </Card>
   );
-}
+});

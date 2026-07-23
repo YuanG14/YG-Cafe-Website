@@ -8,6 +8,8 @@ import { SpinWheel } from '../components/randomdate/SpinWheel';
 import { ResultCard } from '../components/randomdate/ResultCard';
 import { useCafes } from '../hooks/useCafes';
 import { useWishlist } from '../hooks/useWishlist';
+import { useToast } from '../context/ToastContext';
+import { usePageMeta } from '../lib/seo';
 import { buildCandidatePool, MODE_COPY } from '../lib/randomDatePool';
 import type { RandomDateMode, RandomDateCandidate } from '../types/randomDate';
 
@@ -16,8 +18,13 @@ const MODE_OPTIONS: { value: RandomDateMode; label: string }[] = (
 ).map((mode) => ({ value: mode, label: MODE_COPY[mode].label }));
 
 export function RandomDate() {
+  usePageMeta({
+    title: 'Pick for us',
+    description: "Can't agree where to go? Let the wheel decide.",
+  });
   const { cafes, loading: cafesLoading } = useCafes();
   const { items: wishlist, loading: wishlistLoading } = useWishlist();
+  const { success } = useToast();
 
   const [mode, setMode] = useState<RandomDateMode>('favorite');
   const [budget, setBudget] = useState(500);
@@ -52,6 +59,9 @@ export function RandomDate() {
   function handleLanded() {
     setSpinning(false);
     setRevealedCandidate(pendingCandidate);
+    if (pendingCandidate) {
+      success(`Tonight's pick: ${pendingCandidate.name}!`);
+    }
   }
 
   const copy = MODE_COPY[mode];

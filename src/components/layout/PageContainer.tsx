@@ -8,7 +8,11 @@ interface PageContainerProps {
 
 export function PageContainer({ children, className }: PageContainerProps) {
   return (
-    <main className={cn('mx-auto w-full max-w-6xl px-4 sm:px-6 py-12 sm:py-16', className)}>
+    <main
+      id="main-content"
+      tabIndex={-1}
+      className={cn('mx-auto w-full max-w-6xl px-4 sm:px-6 py-12 sm:py-16 outline-none', className)}
+    >
       {children}
     </main>
   );

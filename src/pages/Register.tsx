@@ -5,9 +5,13 @@ import { AuthLayout } from '../components/auth/AuthLayout';
 import { TextField } from '../components/ui/TextField';
 import { Button } from '../components/ui/Button';
 import { useAuth } from '../context/AuthContext';
+import { useToast } from '../context/ToastContext';
+import { usePageMeta } from '../lib/seo';
 
 export function Register() {
+  usePageMeta({ title: 'Create an account', description: 'Create an account for Our Cafe Journal.' });
   const { signUp } = useAuth();
+  const { success } = useToast();
   const navigate = useNavigate();
 
   const [email, setEmail] = useState('');
@@ -45,6 +49,7 @@ export function Register() {
     }
 
     // Email confirmation disabled on the Supabase project → session exists already.
+    success('Account created — welcome!');
     navigate('/', { replace: true });
   }
 

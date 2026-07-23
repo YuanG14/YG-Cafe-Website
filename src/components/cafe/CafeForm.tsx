@@ -27,18 +27,21 @@ export function CafeForm({ initialValue, submitLabel, onSubmit, onCancel }: Cafe
   const [values, setValues] = useState<CafeInput>(initialValue);
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [nameError, setNameError] = useState<string | null>(null);
 
   function update<K extends keyof CafeInput>(key: K, value: CafeInput[K]) {
     setValues((prev) => ({ ...prev, [key]: value }));
+    if (key === 'name' && nameError) setNameError(null);
   }
 
   async function handleSubmit(e: FormEvent) {
     e.preventDefault();
     if (!values.name.trim()) {
-      setError('Give the cafe a name before saving.');
+      setNameError('Give the cafe a name before saving.');
       return;
     }
 
+    setNameError(null);
     setError(null);
     setSubmitting(true);
     try {
@@ -57,6 +60,7 @@ export function CafeForm({ initialValue, submitLabel, onSubmit, onCancel }: Cafe
         <TextField
           label="Cafe name"
           required
+          error={nameError ?? undefined}
           value={values.name}
           onChange={(e) => update('name', e.target.value)}
         />

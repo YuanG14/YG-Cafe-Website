@@ -12,7 +12,7 @@ interface UseWishlistResult {
   loading: boolean;
   error: string | null;
   refetch: () => Promise<void>;
-  removeItem: (id: string) => Promise<void>;
+  removeItem: (id: string) => Promise<boolean>;
   /** Converts to a real Cafe Collection entry and returns the new cafe's id. */
   convertToCollection: (item: WishlistCafe, userId: string) => Promise<string>;
 }
@@ -39,13 +39,15 @@ export function useWishlist(): UseWishlistResult {
     refetch();
   }, [refetch]);
 
-  async function removeItem(id: string) {
+  async function removeItem(id: string): Promise<boolean> {
     const previous = items;
     setItems((prev) => prev.filter((i) => i.id !== id));
     try {
       await deleteWishlistItem(id);
+      return true;
     } catch {
       setItems(previous);
+      return false;
     }
   }
 

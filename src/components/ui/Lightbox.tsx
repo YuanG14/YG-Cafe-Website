@@ -1,4 +1,4 @@
-import { useEffect, useCallback } from 'react';
+import { useEffect, useCallback, useRef } from 'react';
 import { AnimatePresence, motion } from 'framer-motion';
 
 interface LightboxPhoto {
@@ -17,11 +17,15 @@ interface LightboxProps {
 /**
  * Fullscreen image viewer used by CafeGallery. Fully self-contained —
  * pass `index={null}` to keep it unmounted/closed. Handles arrow-key and
- * on-screen navigation, escape-to-close, and backdrop click-to-close.
+ * on-screen navigation, escape-to-close, backdrop click-to-close, traps
+ * Tab focus while open, and returns focus to whatever triggered it on close.
  */
 export function Lightbox({ photos, index, onClose, onIndexChange }: LightboxProps) {
   const isOpen = index !== null;
   const total = photos.length;
+  const dialogRef = useRef<HTMLDivElement>(null);
+  const closeButtonRef = useRef<HTMLButtonElement>(null);
+  const triggerRef = useRef<HTMLElement | null>(null);
 
   const goTo = useCallback(
     (next: number) => {
@@ -30,13 +34,45 @@ export function Lightbox({ photos, index, onClose, onIndexChange }: LightboxProp
     [onIndexChange, total]
   );
 
+  // Remember what had focus before opening, move focus into the dialog, and
+  // return it on close — standard modal focus-management expectations.
+  useEffect(() => {
+    if (!isOpen) return;
+    triggerRef.current = document.activeElement as HTMLElement | null;
+    closeButtonRef.current?.focus();
+
+    return () => {
+      triggerRef.current?.focus();
+    };
+  }, [isOpen]);
+
   useEffect(() => {
     if (!isOpen) return;
 
     function handleKeyDown(e: KeyboardEvent) {
-      if (e.key === 'Escape') onClose();
+      if (e.key === 'Escape') {
+        onClose();
+        return;
+      }
       if (e.key === 'ArrowRight') goTo((index ?? 0) + 1);
       if (e.key === 'ArrowLeft') goTo((index ?? 0) - 1);
+
+      if (e.key === 'Tab' && dialogRef.current) {
+        const focusable = dialogRef.current.querySelectorAll<HTMLElement>(
+          'button, a[href], [tabindex]:not([tabindex="-1"])'
+        );
+        if (focusable.length === 0) return;
+        const first = focusable[0];
+        const last = focusable[focusable.length - 1];
+
+        if (e.shiftKey && document.activeElement === first) {
+          e.preventDefault();
+          last.focus();
+        } else if (!e.shiftKey && document.activeElement === last) {
+          e.preventDefault();
+          first.focus();
+        }
+      }
     }
 
     document.addEventListener('keydown', handleKeyDown);
@@ -51,6 +87,7 @@ export function Lightbox({ photos, index, onClose, onIndexChange }: LightboxProp
     <AnimatePresence>
       {isOpen && index !== null && (
         <motion.div
+          ref={dialogRef}
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           exit={{ opacity: 0 }}
@@ -62,6 +99,7 @@ export function Lightbox({ photos, index, onClose, onIndexChange }: LightboxProp
           aria-label="Photo viewer"
         >
           <button
+            ref={closeButtonRef}
             type="button"
             onClick={onClose}
             aria-label="Close photo viewer"

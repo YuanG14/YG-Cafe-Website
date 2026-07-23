@@ -5,15 +5,20 @@ import { CafeForm } from '../components/cafe/CafeForm';
 import { createCafe } from '../services/cafeService';
 import { EMPTY_CAFE_INPUT } from '../types/cafe';
 import { useAuth } from '../context/AuthContext';
+import { useToast } from '../context/ToastContext';
+import { usePageMeta } from '../lib/seo';
 import type { CafeInput } from '../types/cafe';
 
 export function CafeNew() {
+  usePageMeta({ title: 'Add a cafe', description: 'Add a new cafe to the collection.' });
   const navigate = useNavigate();
   const { user } = useAuth();
+  const { success } = useToast();
 
   async function handleSubmit(input: CafeInput) {
     if (!user) return;
     const cafe = await createCafe(input, user.id);
+    success(`${cafe.name} added to the collection.`);
     navigate(`/collection/${cafe.id}`);
   }
 

@@ -6,12 +6,14 @@ import { SectionHeading } from '../components/ui/SectionHeading';
 import { Card } from '../components/ui/Card';
 import { buttonStyles } from '../components/ui/Button';
 import { StatCard } from '../components/stats/StatCard';
+import { StatsSkeleton } from '../components/stats/StatsSkeleton';
 import { MonthlySpendingChart } from '../components/stats/MonthlySpendingChart';
 import { VisitTimelineChart } from '../components/stats/VisitTimelineChart';
 import { RatingsRadarChart } from '../components/stats/RatingsRadarChart';
 import { TopCafesList } from '../components/stats/TopCafesList';
 import { TopTagsList } from '../components/stats/TopTagsList';
 import { useStats } from '../hooks/useStats';
+import { usePageMeta } from '../lib/seo';
 import { formatCurrency } from '../lib/currency';
 
 const statsContainer: Variants = {
@@ -32,6 +34,10 @@ const sectionMotion = {
 };
 
 export function Stats() {
+  usePageMeta({
+    title: 'Our story',
+    description: 'The numbers behind our cafe visits together.',
+  });
   const {
     loading,
     error,
@@ -53,7 +59,7 @@ export function Stats() {
         className="mb-12"
       />
 
-      {loading && <p className="text-sm text-ink-soft">Loading the numbers…</p>}
+      {loading && <StatsSkeleton />}
 
       {error && (
         <p role="alert" className="text-sm text-red-500">

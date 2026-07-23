@@ -5,13 +5,17 @@ import { AuthLayout } from '../components/auth/AuthLayout';
 import { TextField } from '../components/ui/TextField';
 import { Button } from '../components/ui/Button';
 import { useAuth } from '../context/AuthContext';
+import { useToast } from '../context/ToastContext';
+import { usePageMeta } from '../lib/seo';
 
 interface LocationState {
   from?: { pathname: string };
 }
 
 export function Login() {
+  usePageMeta({ title: 'Log in', description: 'Log in to Our Cafe Journal.' });
   const { signIn } = useAuth();
+  const { success } = useToast();
   const navigate = useNavigate();
   const location = useLocation();
 
@@ -34,6 +38,7 @@ export function Login() {
       return;
     }
 
+    success('Welcome back!');
     const redirectTo = (location.state as LocationState | null)?.from?.pathname ?? '/';
     navigate(redirectTo, { replace: true });
   }

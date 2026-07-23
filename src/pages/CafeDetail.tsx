@@ -5,9 +5,13 @@ import { Badge } from '../components/ui/Badge';
 import { FadeIn } from '../components/ui/FadeIn';
 import { buttonStyles } from '../components/ui/Button';
 import { CafeGallery } from '../components/cafe/CafeGallery';
+import { CafeDetailSkeleton } from '../components/cafe/CafeDetailSkeleton';
 import { RatingsPanel } from '../components/cafe/RatingsPanel';
 import { CafeTimeline } from '../components/cafe/CafeTimeline';
 import { useCafe } from '../hooks/useCafe';
+import { useToast } from '../context/ToastContext';
+import { usePageMeta } from '../lib/seo';
+import { getErrorMessage } from '../lib/errors';
 import { formatCurrency } from '../lib/currency';
 import { deleteCafe, toggleFavorite as toggleFavoriteRequest } from '../services/cafeService';
 
@@ -15,30 +19,42 @@ export function CafeDetail() {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
   const { cafe, loading, error, refetch } = useCafe(id);
+  const { success, error: toastError } = useToast();
   const [deleting, setDeleting] = useState(false);
   const [confirmingDelete, setConfirmingDelete] = useState(false);
+
+  usePageMeta({
+    title: cafe?.name ?? 'Cafe',
+    description: cafe?.journalEntry ?? 'A cafe memory from our collection.',
+  });
 
   async function handleDelete() {
     if (!id) return;
     setDeleting(true);
     try {
       await deleteCafe(id);
+      success('Cafe deleted.');
       navigate('/collection');
-    } catch {
+    } catch (err) {
       setDeleting(false);
+      toastError(getErrorMessage(err, "Couldn't delete this cafe — try again."));
     }
   }
 
   async function handleToggleFavorite() {
     if (!cafe) return;
-    await toggleFavoriteRequest(cafe.id, !cafe.isFavorite);
-    refetch();
+    try {
+      await toggleFavoriteRequest(cafe.id, !cafe.isFavorite);
+      refetch();
+    } catch (err) {
+      toastError(getErrorMessage(err, "Couldn't update that — try again."));
+    }
   }
 
   if (loading) {
     return (
       <PageContainer className="max-w-4xl">
-        <p className="text-sm text-ink-soft">Loading…</p>
+        <CafeDetailSkeleton />
       </PageContainer>
     );
   }

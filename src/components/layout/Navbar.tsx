@@ -1,6 +1,7 @@
 import { NavLink } from 'react-router-dom';
 import { cn } from '../../lib/cn';
 import { useAuth } from '../../context/AuthContext';
+import { useToast } from '../../context/ToastContext';
 
 const NAV_ITEMS = [
   { to: '/', label: 'Home' },
@@ -12,6 +13,12 @@ const NAV_ITEMS = [
 
 export function Navbar() {
   const { user, isAdmin, signOut } = useAuth();
+  const { success } = useToast();
+
+  async function handleSignOut() {
+    await signOut();
+    success('Logged out — see you next time.');
+  }
 
   return (
     <header className="sticky top-4 z-50 px-4">
@@ -58,7 +65,7 @@ export function Navbar() {
             )}
             <button
               type="button"
-              onClick={() => signOut()}
+              onClick={handleSignOut}
               title={`Log out of ${user.email}`}
               className="inline-flex items-center gap-1.5 rounded-pill px-3 py-2 text-xs sm:text-sm font-medium text-ink-soft hover:text-ink hover:bg-blush transition-colors duration-200"
             >
