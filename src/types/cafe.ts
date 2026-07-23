@@ -73,20 +73,6 @@ export const EMPTY_CAFE_INPUT: CafeInput = {
   ratings: EMPTY_RATINGS,
 };
 
-export type WishlistPriority = 'must-visit' | 'interested' | 'someday';
-
-export type WishlistStatus = 'idea' | 'planned' | 'visited';
-
-export interface WishlistCafe {
-  id: string;
-  name: string;
-  priority: WishlistPriority;
-  notes?: string;
-  estimatedBudget?: number;
-  googleMapsUrl?: string;
-  status: WishlistStatus;
-}
-
 export type RandomDateMode =
   | 'favorite-cafe'
   | 'wishlist-cafe'

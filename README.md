@@ -74,6 +74,17 @@ still queued as its own step. `useAuth()` now exposes `profile` and `isAdmin`.
 Your girlfriend's account, and any other signups, default to `member` and
 stay that way unless you run the same SQL for them.
 
+## Phase 6 — Wishlist (this phase)
+
+- **Database:** `wishlist_cafes` table (`supabase/migrations/003_wishlist_schema.sql`) with `priority` and `status` enums, plus a `converted_cafe_id` link back to `cafes` once an item has been visited. Same simple "any authenticated user" RLS as the rest of the app for now.
+- **Service layer:** `src/services/wishlistService.ts` — CRUD plus `convertWishlistItemToCafe()`, which creates a real `cafes` row (pre-filled with the wishlist's name, maps link, and budget) and marks the wishlist entry `visited` with a link to the new cafe.
+- **`useWishlist()` hook** — mirrors `useCafes()`'s shape (loading/error, optimistic delete).
+- **`/wishlist` page:** add/edit inline via `WishlistForm`, priority (`Must visit / Interested / Someday`) and status (`Idea / Planned / Visited`) as pill selectors, "Mark as Planned" and "Mark as Visited" actions, converted items shown in a separate "Already visited" section linking to their new Collection entry.
+
+### Running the Phase 6 migration
+
+Run `supabase/migrations/003_wishlist_schema.sql` in the Supabase SQL Editor — it depends on `set_updated_at()` from `001_cafes_schema.sql` and the `cafes` table itself, so run those first if you haven't already.
+
 ## Getting started
 
 ```bash
