@@ -1,14 +1,9 @@
 import { motion } from 'framer-motion';
 import type { Variants } from 'framer-motion';
+import { Link } from 'react-router-dom';
 import { SectionHeading } from '../ui/SectionHeading';
 import { formatCurrency } from '../../lib/currency';
-
-const STATS = [
-  { value: '12', label: 'Cafes explored' },
-  { value: '4.7', label: 'Average rating' },
-  { value: '3', label: 'Favorites saved' },
-  { value: formatCurrency(286), label: 'Spent chasing good coffee' },
-];
+import { useStats } from '../../hooks/useStats';
 
 const container: Variants = {
   hidden: {},
@@ -21,6 +16,15 @@ const item: Variants = {
 };
 
 export function StatsPreview() {
+  const { hasData, summary } = useStats();
+
+  const stats = [
+    { value: String(summary.totalCafes), label: 'Cafes explored' },
+    { value: summary.avgOverall.toFixed(1), label: 'Average rating' },
+    { value: String(summary.favoritesCount), label: 'Favorites saved' },
+    { value: formatCurrency(summary.totalSpent), label: 'Spent chasing good coffee' },
+  ];
+
   return (
     <section className="py-20">
       <div className="rounded-card bg-blush border border-hairline px-6 sm:px-12 py-14">
@@ -38,7 +42,7 @@ export function StatsPreview() {
           viewport={{ once: true, amount: 0.3 }}
           className="grid grid-cols-2 lg:grid-cols-4 gap-8 sm:gap-10"
         >
-          {STATS.map((stat) => (
+          {stats.map((stat) => (
             <motion.div key={stat.label} variants={item} className="text-center">
               <p className="font-display text-4xl sm:text-5xl font-medium text-primary-deep">
                 {stat.value}
@@ -48,9 +52,13 @@ export function StatsPreview() {
           ))}
         </motion.div>
 
-        <p className="mt-10 text-center text-xs text-ink-faint">
-          Illustrative numbers — the real dashboard arrives in Phase 6.
-        </p>
+        {hasData && (
+          <p className="mt-10 text-center text-xs text-ink-faint">
+            <Link to="/stats" className="font-medium text-accent-deep hover:text-accent transition-colors">
+              See the full dashboard →
+            </Link>
+          </p>
+        )}
       </div>
     </section>
   );
