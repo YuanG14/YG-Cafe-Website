@@ -85,6 +85,18 @@ stay that way unless you run the same SQL for them.
 
 Run `supabase/migrations/003_wishlist_schema.sql` in the Supabase SQL Editor — it depends on `set_updated_at()` from `001_cafes_schema.sql` and the `cafes` table itself, so run those first if you haven't already.
 
+## Phase 7 — Random Date Generator (this phase)
+
+- **No new tables** — this phase reads entirely from existing `cafes` and `wishlist_cafes` data via `useCafes()`/`useWishlist()`.
+- **`lib/randomDatePool.ts`** — pure function mapping the four modes to a candidate pool:
+  - **Favorite** — your favorited cafes (revisit somewhere you already love)
+  - **Wishlist** — unvisited wishlist entries (try somewhere new)
+  - **Budget** — either pool, capped at a budget you set (₱)
+  - **Challenge** — wishlist entries marked "Someday" (the ones you keep putting off)
+- **`SpinWheel`** — a real conic-gradient wheel that always lands exactly on a pre-chosen winner (picked randomly before the spin starts, not guessed at afterward), with a decelerating 3.2s spin and a small random jitter so it doesn't always land dead-center.
+- **`ResultCard`** — reveals the winner with a photo, links straight to its real Collection or Wishlist entry.
+- Each mode has its own empty-state message (e.g. "mark a cafe as favorite first") rather than just showing a blank wheel.
+
 ## Getting started
 
 ```bash

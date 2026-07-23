@@ -26,12 +26,9 @@ export function Hero() {
           <Link to="/collection/new" className={buttonStyles('primary', 'lg')}>
             Add our first cafe
           </Link>
-          <span
-            className={buttonStyles('secondary', 'lg', 'opacity-50 pointer-events-none')}
-            title="Arrives in Phase 5"
-          >
+          <Link to="/random" className={buttonStyles('secondary', 'lg')}>
             Pick a date for us
-          </span>
+          </Link>
         </div>
       </FadeIn>
 

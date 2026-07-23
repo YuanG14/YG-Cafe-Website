@@ -73,9 +73,3 @@ export const EMPTY_CAFE_INPUT: CafeInput = {
   ratings: EMPTY_RATINGS,
 };
 
-export type RandomDateMode =
-  | 'favorite-cafe'
-  | 'wishlist-cafe'
-  | 'budget-date'
-  | 'challenge-mode'
-  | 'hidden-gem';
